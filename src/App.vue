@@ -1,30 +1,37 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view />
+  <div id="app">
+    <el-container style="height: 100vh; width: 100vw">
+      <el-main style="padding: 0; background-color: #f5f5f5">
+        <router-view />
+      </el-main>
+    </el-container>
+  </div>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+<style scoped>
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 60px;
 }
 
-nav {
-  padding: 30px;
+.logo {
+  font-size: 20px;
+  font-weight: bold;
+}
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
+.nav-right {
+  display: flex;
+  align-items: center;
+}
 
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+.el-header {
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.el-main {
+  min-height: 100vh;
 }
 </style>
