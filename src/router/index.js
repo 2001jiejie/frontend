@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { getToken } from '@/utils/auth'
+import { getToken } from "@/utils/auth";
+import adminRoutes from "./Adminindex"; // 导入管理员路由
 
 const routes = [
   {
@@ -18,6 +19,7 @@ const routes = [
       requiresAuth: false,
     },
   },
+  ...adminRoutes, // 展开管理员路由
 ];
 
 const router = createRouter({
@@ -25,15 +27,20 @@ const router = createRouter({
   routes,
 });
 
+// 统一的路由守卫
 router.beforeEach((to, from, next) => {
-  const token = getToken()
-  
+  const token = getToken();
+
   if (to.meta.requiresAuth && !token) {
-    // 需要登录但未登录，跳转到登录页
-    next('/login')
+    // 根据目标路由决定跳转到哪个登录页
+    if (to.path.startsWith("/admin")) {
+      next("/adminlogin");
+    } else {
+      next("/login");
+    }
   } else {
-    next()
+    next();
   }
-})
+});
 
 export default router;
