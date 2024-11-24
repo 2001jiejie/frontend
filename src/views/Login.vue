@@ -186,8 +186,13 @@ const handleRegister = async () => {
       password: registerForm.password,
     });
 
-    if (response.data.code === 200) {
+    if (response.data.code === 1) {
       ElMessage.success("注册成功");
+      // 清空注册表单
+      registerForm.username = "";
+      registerForm.password = "";
+      registerForm.confirmPassword = "";
+      // 切换到登录标签页
       activeTab.value = "login";
     } else {
       ElMessage.error(response.data.message || "注册失败");

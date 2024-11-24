@@ -1,93 +1,119 @@
 <template>
-  <el-container class="layout-container-demo" style="height: 100%">
-    <el-container>
-      <el-header>
-        <!-- 添加搜索框 -->
-        <div class="search-container">
-          <el-input
-            v-model="searchQuery"
-            placeholder="搜索商品"
-            class="search-input"
-            :prefix-icon="Search"
-            @input="handleInput"
-          >
-            <template #append>
-              <el-button :icon="Search" @click="handleSearch"> 搜索 </el-button>
-            </template>
-          </el-input>
+  <el-container class="taobao-layout" style="height: 100%">
+    <el-header class="taobao-header">
+      <!-- 搜索框 -->
+      <div class="taobao-search">
+        <el-input
+          v-model="searchQuery"
+          placeholder="搜索商品、品牌"
+          class="search-input"
+          :prefix-icon="Search"
+          @input="handleInput"
+        >
+          <template #append>
+            <el-button :icon="Search" @click="handleSearch"> 搜索 </el-button>
+          </template>
+        </el-input>
+      </div>
+
+      <!-- 工具栏 -->
+      <div class="taobao-toolbar">
+        <router-link to="/login" class="login-link">
+          <el-button type="primary" size="small">登录</el-button>
+        </router-link>
+        <el-divider direction="vertical" />
+        <el-dropdown>
+          <el-icon style="margin-right: 8px; margin-top: 1px">
+            <setting />
+          </el-icon>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item>我的订单</el-dropdown-item>
+              <el-dropdown-item>购物车</el-dropdown-item>
+              <el-dropdown-item>收藏夹</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+        <span>欢迎，用户</span>
+      </div>
+    </el-header>
+
+    <el-main>
+      <el-scrollbar>
+        <div class="category-buttons">
+          <el-button-group>
+            <el-button
+              type="primary"
+              :plain="activeCategory !== 'all'"
+              @click="changeCategory('all')"
+            >
+              全部
+            </el-button>
+            <el-button
+              type="primary"
+              :plain="activeCategory !== 'electronics'"
+              @click="changeCategory('electronics')"
+            >
+              电子产品
+            </el-button>
+            <el-button
+              type="primary"
+              :plain="activeCategory !== 'fashion'"
+              @click="changeCategory('fashion')"
+            >
+              服装
+            </el-button>
+            <el-button
+              type="primary"
+              :plain="activeCategory !== 'home'"
+              @click="changeCategory('home')"
+            >
+              家具
+            </el-button>
+            <el-button
+              type="primary"
+              :plain="activeCategory !== 'books'"
+              @click="changeCategory('books')"
+            >
+              书籍
+            </el-button>
+          </el-button-group>
         </div>
 
-        <div class="toolbar" style="position: absolute; top: 10px; right: 30px">
-          <router-link to="/login" class="login-link">
-            <el-button type="primary" size="small">登录</el-button>
-          </router-link>
-          <el-divider direction="vertical" />
-          <el-dropdown>
-            <el-icon style="margin-right: 8px; margin-top: 1px">
-              <setting />
-            </el-icon>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item>查看</el-dropdown-item>
-                <el-dropdown-item>新增</el-dropdown-item>
-                <el-dropdown-item>删除</el-dropdown-item>
-              </el-dropdown-menu>
+        <el-table
+          :data="tableData"
+          style="margin-top: 20px"
+          @selection-change="handleSelectionChange"
+        >
+          <el-table-column type="selection" width="55"></el-table-column>
+          <el-table-column prop="date" label="日期" width="140" />
+          <el-table-column prop="name" label="商品名称" width="120" />
+          <el-table-column prop="address" label="发货地" />
+          <el-table-column label="图片" width="120">
+            <template #default="scope">
+              <img
+                :src="scope.row.image"
+                alt="商品图片"
+                style="width: 100px; height: auto"
+              />
             </template>
-          </el-dropdown>
-          <span>王小虎</span>
-        </div>
-      </el-header>
-
-      <el-main>
-        <el-scrollbar>
-          <div class="nav-buttons">
-            <el-button-group>
-              <el-button
-                type="primary"
-                :plain="activeCategory !== 'all'"
-                @click="changeCategory('all')"
+          </el-table-column>
+          <el-table-column label="操作" width="300">
+            <template #default="scope">
+              <el-button size="mini" @click="addToFavorites(scope.row)"
+                >添加进收藏</el-button
               >
-                全部商品
-              </el-button>
-              <el-button
-                type="primary"
-                :plain="activeCategory !== 'electronics'"
-                @click="changeCategory('electronics')"
+              <el-button size="mini" @click="addToCart(scope.row)"
+                >添加进购物车</el-button
               >
-                电子
-              </el-button>
-              <el-button
-                type="primary"
-                :plain="activeCategory !== 'clothing'"
-                @click="changeCategory('clothing')"
+              <el-button size="mini" type="primary" @click="buyNow(scope.row)"
+                >直接购买</el-button
               >
-                衣服
-              </el-button>
-              <el-button
-                type="primary"
-                :plain="activeCategory !== 'furniture'"
-                @click="changeCategory('furniture')"
-              >
-                家具
-              </el-button>
-              <el-button
-                type="primary"
-                :plain="activeCategory !== 'books'"
-                @click="changeCategory('books')"
-              >
-                书籍
-              </el-button>
-            </el-button-group>
-          </div>
-
-          <el-table :data="tableData" style="margin-top: 20px">
-            <el-table-column prop="date" label="日期" width="140" />
-            <el-table-column prop="name" label="姓名" width="120" />
-            <el-table-column prop="address" label="地址" />
-          </el-table>
-        </el-scrollbar>
-      </el-main>
-    </el-container>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-scrollbar>
+    </el-main>
   </el-container>
 </template>
 
@@ -95,13 +121,18 @@
 import { ref } from "vue";
 import { Setting, Search } from "@element-plus/icons-vue";
 
-const item = {
-  date: "2016-05-02",
-  name: "王小虎",
-  address: "上海市普陀区金沙江路 1518 弄",
-};
-
-const tableData = ref(Array(20).fill(item));
+const tableData = ref(
+  Array(20)
+    .fill(null)
+    .map((_, index) => ({
+      id: index + 1,
+      date: "2023-10-01",
+      name: `商品示例 ${index + 1}`,
+      address: "浙江省杭州市",
+      image: `https://via.placeholder.com/100?text=商品${index + 1}`,
+    }))
+);
+const selectedItems = ref([]);
 
 const activeCategory = ref("all");
 
@@ -122,27 +153,40 @@ const handleSearch = () => {
     // 这里添加搜索逻辑
   }
 };
+
+const handleSelectionChange = (val) => {
+  selectedItems.value = val;
+  console.log("选中的商品:", selectedItems.value);
+};
+
+const addToFavorites = (item) => {
+  console.log("添加进收藏:", item);
+  // 这里添加收藏逻辑
+};
+
+const addToCart = (item) => {
+  console.log("添加进购物车:", item);
+  // 这里添加购物车逻辑
+};
+
+const buyNow = (item) => {
+  console.log("直接购买:", item);
+  // 这里添加购买逻辑
+};
 </script>
 
 <style scoped>
-.layout-container-demo .el-header {
+.taobao-layout .taobao-header {
   position: relative;
   background-color: var(--el-color-primary-light-7);
   color: var(--el-text-color-primary);
+  padding: 10px 20px;
 }
 
-.layout-container-demo .el-menu {
-  border-right: none;
-}
-
-.layout-container-demo .el-main {
-  padding: 20px;
-}
-
-.toolbar {
+.taobao-toolbar {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   height: 100%;
   gap: 12px;
 }
@@ -151,7 +195,7 @@ const handleSearch = () => {
   text-decoration: none;
 }
 
-.nav-buttons {
+.category-buttons {
   display: flex;
   justify-content: center;
   padding: 10px 0;
@@ -159,11 +203,11 @@ const handleSearch = () => {
   border-radius: 4px;
 }
 
-.nav-buttons .el-button-group {
+.category-buttons .el-button-group {
   margin: 0 auto;
 }
 
-.nav-buttons .el-button {
+.category-buttons .el-button {
   padding: 8px 20px;
 }
 
@@ -175,10 +219,10 @@ const handleSearch = () => {
   margin-top: 20px;
 }
 
-.search-container {
+.taobao-search {
   display: flex;
   align-items: center;
-  max-width: 500px;
+  max-width: 600px;
   margin: 0 auto;
   padding-top: 10px;
 }

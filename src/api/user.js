@@ -61,10 +61,17 @@ export const login = (data) => {
 };
 
 export const register = (data) => {
+  const params = new URLSearchParams({
+    username: data.username,
+    password: data.password,
+  });
+
   return request({
-    url: "/register",
+    url: `/register?${params.toString()}`,
     method: "post",
-    data,
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
   });
 };
 
