@@ -13,7 +13,7 @@ export const productApi = {
 
     if (category !== "全部" && category !== "") {
       const params = new URLSearchParams({ gtype: category });
-      config.url = `/home?${params.toString()}`;
+      config.url = `/home/search?${params.toString()}`;
       config.method = "get";
       config.headers = {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -49,10 +49,25 @@ export const productApi = {
 
   // 搜索商品
   searchProducts(keyword) {
-    return request({
-      url: "/api/products/search",
+    console.log("API 调用 searchProducts，参数:", keyword);
+    const config = {
+      url: "/home/search",
       method: "get",
-      params: { keyword },
-    });
+    };
+    const params = new URLSearchParams({ gname: keyword });
+    config.url = `/home/search?${params.toString()}`;
+    config.method = "get";
+    config.headers = {
+      "Content-Type": "application/x-www-form-urlencoded",
+    };
+    return request(config)
+      .then((response) => {
+        console.log("API 响应成功:", response);
+        return response;
+      })
+      .catch((error) => {
+        console.error("API 请求失败:", error);
+        throw error;
+      });
   },
 };

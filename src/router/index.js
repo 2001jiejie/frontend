@@ -18,6 +18,30 @@ const routes = [
       requiresAuth: false,
     },
   },
+  {
+    path: "/orders",
+    name: "orders",
+    component: () => import("../views/Orders.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/cart",
+    name: "cart",
+    component: () => import("../views/Cart.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/favorites",
+    name: "favorites",
+    component: () => import("../views/Favorites.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
 ];
 
 const router = createRouter({
@@ -27,9 +51,11 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const token = getToken();
+  console.log("当前路由:", to.path);
+  console.log("requiresAuth:", to.meta.requiresAuth);
+  console.log("token:", token);
 
   if (to.meta.requiresAuth && !token) {
-    // 需要登录但未登录，跳转到登录页
     next("/login");
   } else {
     next();
