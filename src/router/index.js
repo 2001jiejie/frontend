@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { getToken } from "@/utils/auth";
+import adminRoutes from "./Adminindex"; // 导入管理员路由
 
 const routes = [
   {
@@ -47,6 +48,7 @@ const routes = [
     name: "OrderDetail",
     component: () => import("@/views/OrderDetail.vue"),
   },
+  ...adminRoutes, // 展开管理员路由
 ];
 
 const router = createRouter({
@@ -54,6 +56,7 @@ const router = createRouter({
   routes,
 });
 
+// 统一的路由守卫
 router.beforeEach((to, from, next) => {
   const token = getToken();
   console.log("当前路由:", to.path);
@@ -61,6 +64,12 @@ router.beforeEach((to, from, next) => {
   console.log("token:", token);
 
   if (to.meta.requiresAuth && !token) {
+    // 根据目标路由决定跳转到哪个登录页
+    if (to.path.startsWith("/admin")) {
+      next("/adminlogin");
+    } else {
+      next("/login");
+    }
     next("/login");
   } else {
     next();

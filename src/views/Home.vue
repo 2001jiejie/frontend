@@ -51,37 +51,32 @@
               type="primary"
               :plain="activeCategory !== 'all'"
               @click="changeCategory('全部')"
+              >全部</el-button
             >
-              全部
-            </el-button>
             <el-button
               type="primary"
               :plain="activeCategory !== 'electronics'"
               @click="changeCategory('电子产品')"
+              >电子产品</el-button
             >
-              电子产品
-            </el-button>
             <el-button
               type="primary"
               :plain="activeCategory !== 'clothes'"
               @click="changeCategory('服装')"
+              >服装</el-button
             >
-              服装
-            </el-button>
             <el-button
               type="primary"
               :plain="activeCategory !== 'furniture'"
               @click="changeCategory('家具')"
+              >家具</el-button
             >
-              家具
-            </el-button>
             <el-button
               type="primary"
               :plain="activeCategory !== 'books'"
               @click="changeCategory('书籍')"
+              >书籍</el-button
             >
-              书籍
-            </el-button>
           </el-button-group>
 
           <div class="batch-operations">
@@ -243,14 +238,12 @@ const handleSearch = async () => {
 // 添加图片处理函数
 const getImageUrl = (imageName) => {
   try {
-    // 如果图片路径已经包含了 ../assets，则移除它
-    const cleanImageName = imageName.replace("../assets/", "");
-    // 使用动态导入
-    return new URL(`../assets/${cleanImageName}`, import.meta.url).href;
+    // 使用 require 来动态加载图片
+    return require(`@/assets/${imageName}`);
   } catch (error) {
-    console.error("图片加载错误:", error);
-    // 返回一个默认图片
-    return new URL("../assets/logo.png", import.meta.url).href;
+    console.error("图片加载失败", error);
+    // 返回默认图片
+    return require("@/assets/logo.png");
   }
 };
 

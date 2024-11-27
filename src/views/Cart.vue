@@ -150,16 +150,15 @@ const checkout = async () => {
 // 复用你的图片处理函数
 const getImageUrl = (imageName) => {
   try {
-    const cleanImageName = imageName.replace("../assets/", "");
-    return new URL(`../assets/${cleanImageName}`, import.meta.url).href;
+    return require(`@/assets/${imageName}`);
   } catch (error) {
     console.error("图片加载错误:", error);
-    return new URL("../assets/logo.png", import.meta.url).href;
+    return require("@/assets/logo.png");
   }
 };
 
 const handleImageError = (e) => {
-  e.target.src = new URL("../assets/logo.png", import.meta.url).href;
+  e.target.src = require("@/assets/logo.png");
 };
 
 onMounted(() => {

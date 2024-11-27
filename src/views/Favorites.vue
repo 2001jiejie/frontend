@@ -104,14 +104,12 @@ const batchPlaceOrders = async () => {
 };
 const getImageUrl = (imageName) => {
   try {
-    // 如果图片路径已经包含了 ../assets，则移除它
-    const cleanImageName = imageName.replace("../assets/", "");
-    // 使用动态导入
-    return new URL(`../assets/${cleanImageName}`, import.meta.url).href;
+    // 使用 require 来动态加载图片
+    return require(`@/assets/${imageName}`);
   } catch (error) {
     console.error("图片加载错误:", error);
     // 返回一个默认图片
-    return new URL("../assets/logo.png", import.meta.url).href;
+    return require("@/assets/logo.png");
   }
 };
 
@@ -119,7 +117,7 @@ const getImageUrl = (imageName) => {
 const handleImageError = (e) => {
   console.error("图片加载失败");
   // 设置默认图片
-  e.target.src = new URL("../assets/logo.png", import.meta.url).href;
+  e.target.src = require("@/assets/logo.png");
 };
 
 onMounted(() => {
