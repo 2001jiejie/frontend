@@ -14,7 +14,7 @@
             <template #default="scope">
               <el-image
                 style="width: 100px; height: 100px"
-                :src="getImageUrl(scope.row.image)"
+                :src="getImageUrl(scope.row.gpicture)"
                 fit="cover"
                 @error="handleImageError"
               />
@@ -52,7 +52,7 @@ import { ref, computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { getOrderDetail } from "@/api/orders";
 import { ElMessage } from "element-plus";
-import defaultImg from "@/assets/default.png";
+import defaultImage from "@/assets/logo.png";
 
 const route = useRoute();
 const orderId = ref(route.params.id);
@@ -106,17 +106,18 @@ onMounted(() => {
   fetchOrderDetail();
 });
 
-const getImageUrl = (path) => {
+const getImageUrl = (imageName) => {
   try {
-    return new URL(`../assets/${path}`, import.meta.url).href;
+    return require(`@/assets/${imageName}`);
   } catch (error) {
-    console.error("图片加载失败:", error);
-    return defaultImg;
+    console.error("图片加载失败", error);
+    return defaultImage;
   }
 };
 
-const handleImageError = (e) => {
-  e.target.src = defaultImg;
+const handleImageError = (event) => {
+  console.error("图片加载失败");
+  event.target.src = defaultImage;
 };
 </script>
 
