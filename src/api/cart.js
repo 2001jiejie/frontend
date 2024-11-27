@@ -41,7 +41,7 @@ export async function getCartItemsApi() {
         cart_id: cartItem ? cartItem.id : null, // 保存购物车项的ID
       };
     });
-
+    console.log("合并后的数据：", mergedData);
     // 返回统一的数据格式
     return {
       data: {
@@ -68,11 +68,13 @@ export function addToCartApi(goodsId, quantity = 1) {
 
 // 更新购物车商品数量
 export function updateCartItemApi(cartItemId, quantity) {
+  console.log("更新购物车商品数量：", cartItemId, quantity);
   return request({
-    url: `/cart/${cartItemId}`,
-    method: "put",
+    url: "/updatecart",
+    method: "post",
     data: {
-      quantity,
+      cart_id: cartItemId,
+      shoppingnum: quantity,
     },
   });
 }

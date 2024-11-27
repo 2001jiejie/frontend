@@ -65,9 +65,8 @@ import {
   getCartItemsApi,
   removeFromCartApi,
   updateCartItemApi,
-  checkoutApi,
 } from "@/api/cart";
-
+import { batchPurchaseApi } from "@/api/batchOperations";
 const router = useRouter();
 const cartItems = ref([]);
 const loading = ref(false);
@@ -136,11 +135,11 @@ const checkout = async () => {
     return;
   }
   try {
-    const items = selectedItems.value.map((item) => ({
-      id: item.id,
-      quantity: item.shoppingnum,
-    }));
-    await checkoutApi(items);
+    const productIds = selectedItems.value.map((item) => item.id);
+    const quantities = selectedItems.value.map((item) => item.shoppingnum);
+    console.log("productIds:", productIds);
+    console.log("quantities:", quantities);
+    await batchPurchaseApi(productIds, quantities);
     ElMessage.success("下单成功");
     fetchCartItems();
   } catch (error) {
