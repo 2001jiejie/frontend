@@ -4,21 +4,45 @@ const adminRoutes = [
   {
     path: "/admin",
     name: "admin",
-    component: () => import("../views/Home.vue"),
+    component: () => import("../views/Admin/AdminHome.vue"),
+    redirect: "/admin/users",
     meta: {
       requiresAuth: true, // 需要认证
     },
-    // children: [
-    //   {
-    //     path: "settings",
-    //     name: "adminSettings",
-    //     component: () => import("../views/AdminLogin.vue"),
-    //     meta: {
-    //       requiresAuth: true, // 需要认证
-    //     },
-    //   },
-    //   // 添加更多管理员子路由
-    // ],
+    children: [
+      {
+        path: "users",
+        name: "users",
+        component: () => import("../views/Admin/Users.vue"),
+        meta: {
+          requiresAuth: true,
+        },
+      },
+      {
+        path: "goodstype",
+        name: "goodstype",
+        component: () => import("../views/Admin/GoodStype.vue"),
+        meta: {
+          requiresAuth: true,
+        },
+      },
+      {
+        path: "goods",
+        name: "goods",
+        component: () => import("../views/Admin/Goods.vue"),
+        meta: {
+          requiresAuth: true,
+        },
+      },
+      {
+        path: "order",
+        name: "order",
+        component: () => import("../views/Admin/Order.vue"),
+        meta: {
+          requiresAuth: true,
+        },
+      },
+    ],
   },
   {
     path: "/adminlogin",

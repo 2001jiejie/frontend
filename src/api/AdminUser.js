@@ -1,64 +1,206 @@
-import axios from "axios";
-import { ElMessage } from "element-plus";
-import router from "@/router";
+import request from "@/utils/request";
 
-// 创建 axios 实例
-const request = axios.create({
-  baseURL: "http://localhost:8082", // 设置基础URL
-  timeout: 5000, // 设置超时时间
-});
+// 用户相关的 API 接口
+export const AdminuserApi = {
+  // 登录
+  login(data) {
+    const params = new URLSearchParams({
+      ausername: data.ausername,
+      apassword: data.apassword,
+    });
 
-// 请求拦截器
-request.interceptors.request.use(
-  (config) => {
-    // 如果有token则添加到请求头
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
-    }
-    return config;
+    return request({
+      url: `/adminlogin?${params.toString()}`,
+      method: "post",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
   },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
 
-// 响应拦截器
-request.interceptors.response.use(
-  (response) => {
-    return response;
+  // 退出登录
+  logout() {
+    return request({
+      url: "/adminlogout",
+      method: "get",
+    });
   },
-  (error) => {
-    if (error.response) {
-      switch (error.response.status) {
-        case 401:
-          // 未授权，清除token并跳转到登录页
-          localStorage.removeItem("token");
-          router.push("/login");
-          break;
-        default:
-          ElMessage.error(error.response.data.message || "请求失败");
-      }
-    }
-    return Promise.reject(error);
-  }
-);
 
-// 登录
-export const login = (data) => {
-  // 将数据转换为 URL 参数格式
-  const params = new URLSearchParams({
-    username: data.username,
-    password: data.password,
-  });
+  // 获取所有用户
+  getUsers() {
+    return request({
+      url: "/admin/users",
+      method: "get",
+    });
+  },
 
-  return request({
-    url: `/adminlogin?${params.toString()}`, // 将参数添加到 URL 中
-    method: "post",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-  });
+  // 批量删除用户
+  deleteUsers(ids) {
+    return request({
+      url: `/admin/deleteusers`,
+      method: "delete",
+      data: ids,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  },
+
+  // 删除单个用户
+  deleteUser(id) {
+    return request({
+      url: `/admin/deleteuser`,
+      method: "delete",
+      params: { id },
+    });
+  },
+
+  // 搜索用户（根据 ID）
+  searchUsers(id) {
+    return request({
+      url: `/admin/searchuser`,
+      method: "get",
+      params: { id },
+    });
+  },
+
+  // 获取所有商品类型
+  getGoodstypes() {
+    return request({
+      url: "/admin/goodstypes",
+      method: "get",
+    });
+  },
+
+  // 搜索商品类型
+  searchGoodstypes(typename) {
+    return request({
+      url: "/admin/searchgoodstype",
+      method: "get",
+      params: { typename },
+    });
+  },
+
+  // 新增商品类型
+  addGoodstype(goodstype) {
+    return request({
+      url: "/admin/addgoodstype",
+      method: "post",
+      data: goodstype,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  },
+
+  // 删除单个商品类型
+  deleteGoodstype(id) {
+    return request({
+      url: "/admin/deletegoodstype",
+      method: "delete",
+      params: { id },
+    });
+  },
+
+  // 批量删除商品类型
+  deleteGoodstypes(ids) {
+    return request({
+      url: "/admin/deletegoodstypes",
+      method: "delete",
+      data: ids,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  },
+
+  // 获取当前用户信息
+  getUserInfo() {
+    return request({
+      url: "/adminuser",
+      method: "get",
+    });
+  },
+
+  // 获取所有订单
+  getOrders() {
+    return request({
+      url: "/admin/orders",
+      method: "get",
+    });
+  },
+
+  // 查询订单
+  searchOrders(id) {
+    return request({
+      url: `/admin/searchorder`,
+      method: "get",
+      params: { id },
+    });
+  },
+
+  getGoods() {
+    return request({
+      url: "/admin/goods",
+      method: "get",
+    });
+  },
+
+  searchGoods(params) {
+    return request({
+      url: "/admin/searchgoods",
+      method: "get",
+      params,
+    });
+  },
+
+  addGoods(goods) {
+    return request({
+      url: "/admin/addgoods",
+      method: "post",
+      data: goods,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  },
+  updateGoods(goods) {
+    return request({
+      url: "/admin/updategoods",
+      method: "put",
+      data: goods,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  },
+
+  deleteGood(id) {
+    return request({
+      url: "/admin/deletegood",
+      method: "delete",
+      params: { id },
+    });
+  },
+
+  deleteGoods(ids) {
+    return request({
+      url: "/admin/deletegoods",
+      method: "delete",
+      data: ids,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  },
+  // 上传文件
+  uploadFile(file) {
+    const formData = new FormData();
+    formData.append("file", file);
+    return request({
+      url: "/upload",
+      method: "post",
+      data: formData,
+    });
+  },
 };
-
-export default request;

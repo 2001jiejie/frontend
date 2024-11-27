@@ -11,7 +11,7 @@
           @input="handleInput"
         >
           <template #append>
-            <el-button :icon="Search" @click="handleSearch"> 搜索 </el-button>
+            <el-button :icon="Search" @click="handleSearch">搜索</el-button>
           </template>
         </el-input>
       </div>
@@ -45,38 +45,33 @@
             <el-button
               type="primary"
               :plain="activeCategory !== 'all'"
-              @click="changeCategory('all')"
+              @click="changeCategory('全部')"
+              >全部</el-button
             >
-              全部
-            </el-button>
             <el-button
               type="primary"
               :plain="activeCategory !== 'electronics'"
-              @click="changeCategory('electronics')"
+              @click="changeCategory('电子产品')"
+              >电子产品</el-button
             >
-              电子产品
-            </el-button>
             <el-button
               type="primary"
-              :plain="activeCategory !== 'fashion'"
-              @click="changeCategory('fashion')"
+              :plain="activeCategory !== 'clothes'"
+              @click="changeCategory('服装')"
+              >服装</el-button
             >
-              服装
-            </el-button>
             <el-button
               type="primary"
-              :plain="activeCategory !== 'home'"
-              @click="changeCategory('home')"
+              :plain="activeCategory !== 'furniture'"
+              @click="changeCategory('家具')"
+              >家具</el-button
             >
-              家具
-            </el-button>
             <el-button
               type="primary"
               :plain="activeCategory !== 'books'"
-              @click="changeCategory('books')"
+              @click="changeCategory('书籍')"
+              >书籍</el-button
             >
-              书籍
-            </el-button>
           </el-button-group>
         </div>
 
@@ -86,15 +81,18 @@
           @selection-change="handleSelectionChange"
         >
           <el-table-column type="selection" width="55"></el-table-column>
-          <el-table-column prop="date" label="日期" width="140" />
-          <el-table-column prop="name" label="商品名称" width="120" />
-          <el-table-column prop="address" label="发货地" />
-          <el-table-column label="图片" width="120">
+          <el-table-column prop="gname" label="商品名称" width="240" />
+          <el-table-column prop="gtype" label="商品类型" width="200" />
+          <el-table-column prop="goprice" label="原价" width="200" />
+          <el-table-column prop="grprice" label="现价" width="200" />
+          <el-table-column prop="gstore" label="库存" width="200" />
+          <el-table-column label="图片" width="200">
             <template #default="scope">
               <img
-                :src="scope.row.image"
+                :src="getImageUrl(scope.row.gpicture)"
                 alt="商品图片"
                 style="width: 100px; height: auto"
+                @error="handleImageError"
               />
             </template>
           </el-table-column>
@@ -104,7 +102,7 @@
                 >添加进收藏</el-button
               >
               <el-button size="mini" @click="addToCart(scope.row)"
-                >添加进购物车</el-button
+                >添加进物车</el-button
               >
               <el-button size="mini" type="primary" @click="buyNow(scope.row)"
                 >直接购买</el-button
@@ -118,61 +116,108 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { Setting, Search } from "@element-plus/icons-vue";
+import { ref, onMounted } from "vue";
+import { productApi } from "@/api/product";
+import { ElMessage } from "element-plus";
 
-const tableData = ref(
-  Array(20)
-    .fill(null)
-    .map((_, index) => ({
-      id: index + 1,
-      date: "2023-10-01",
-      name: `商品示例 ${index + 1}`,
-      address: "浙江省杭州市",
-      image: `https://via.placeholder.com/100?text=商品${index + 1}`,
-    }))
-);
-const selectedItems = ref([]);
-
-const activeCategory = ref("all");
-
-const changeCategory = (category) => {
-  activeCategory.value = category;
-  console.log("切换到分类:", category);
-};
-
+const tableData = ref([]);
+const loading = ref(false);
 const searchQuery = ref("");
+const activeCategory = ref("全部");
+// 获取商品列表
+const fetchProducts = async (category) => {
+  const typeMapping = {
+    1: "电子产品",
+    2: "服装",
+    3: "家具",
+    4: "书籍",
+  };
 
-const handleInput = (value) => {
-  searchQuery.value = value;
-};
+  try {
+    console.log("开始获取商品，类别:", category);
+    loading.value = true;
 
-const handleSearch = () => {
-  if (searchQuery.value.trim()) {
-    console.log("搜索关键词:", searchQuery.value);
-    // 这里添加搜索逻辑
+    const response = await productApi.getProducts(category);
+    console.log("API响应完整数据:", response);
+
+    // 检查响应结构
+    if (!response || !response.data) {
+      console.error("响应为空");
+      throw new Error("响应数据为空");
+    }
+
+    // 从 response.data.data 获取商品数组
+    const productsArray = response.data.data;
+    console.log("解析出的商品数组:", productsArray);
+
+    // 检查是否为数组
+    if (!Array.isArray(productsArray)) {
+      console.error("商品数据不是数组:", productsArray);
+      throw new Error("商品数据格式错误");
+    }
+
+    // 转换数据
+    tableData.value = productsArray.map((item) => ({
+      ...item,
+      gtype: typeMapping[item.goodstype_id] || "未知类型",
+    }));
+
+    console.log("数据处理完成，最终结果:", tableData.value);
+  } catch (error) {
+    console.error("获取商品列表失败:", error);
+    ElMessage.error("获取商品列表失败");
+  } finally {
+    loading.value = false;
   }
 };
 
-const handleSelectionChange = (val) => {
-  selectedItems.value = val;
-  console.log("选中的商品:", selectedItems.value);
+const changeCategory = async (category) => {
+  console.log("切换分类:", category);
+  activeCategory.value = category;
+  await fetchProducts(category);
 };
 
-const addToFavorites = (item) => {
-  console.log("添加进收藏:", item);
-  // 这里添加收藏逻辑
+// 搜索商品
+const handleSearch = async () => {
+  if (searchQuery.value.trim()) {
+    try {
+      loading.value = true;
+      const data = await productApi.searchProducts(searchQuery.value);
+      tableData.value = data;
+    } catch (error) {
+      ElMessage.error("搜索失败");
+    } finally {
+      loading.value = false;
+    }
+  }
 };
 
-const addToCart = (item) => {
-  console.log("添加进购物车:", item);
-  // 这里添加购物车逻辑
+// 添加图片处理函数
+const getImageUrl = (imageName) => {
+  console.log("获取图片URL:", imageName);
+  try {
+    // 如果图片路径已经包含了 ../assets，则移除它
+    const cleanImageName = imageName.replace("../assets/", "");
+    // 使用动态导入
+    return new URL(`../assets/${cleanImageName}`, import.meta.url).href;
+  } catch (error) {
+    console.error("图片加载错误:", error);
+    // 返回一个默认图片
+    return new URL("../assets/logo.png", import.meta.url).href;
+  }
 };
 
-const buyNow = (item) => {
-  console.log("直接购买:", item);
-  // 这里添加购买逻辑
+// 添加图片加载错误处理
+const handleImageError = (e) => {
+  console.error("图片加载失败");
+  // 设置默认图片
+  e.target.src = new URL("../assets/logo.png", import.meta.url).href;
 };
+
+onMounted(async () => {
+  console.log("组件挂载，开始获取商品");
+  await fetchProducts("全部");
+});
 </script>
 
 <style scoped>

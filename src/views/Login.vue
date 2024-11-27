@@ -99,7 +99,7 @@
 import { ref, reactive } from "vue";
 import { ElMessage } from "element-plus";
 import { User, Lock } from "@element-plus/icons-vue";
-import { login, register } from "@/api/user"; // 导入API方法
+import { userApi } from "@/api/user"; // 修改这里的导入方式
 import { useRouter } from "vue-router"; // 添加路由
 
 const router = useRouter(); // 用于登录成功后跳转
@@ -151,10 +151,7 @@ const handleLogin = async () => {
 
   try {
     await loginFormRef.value.validate();
-    const response = await login({
-      username: loginForm.username,
-      password: loginForm.password,
-    });
+    const response = await userApi.login(loginForm); // 使用 userApi.login 而不是直接使用 login
 
     console.log("登录响应:", response); // 调试日志
 
@@ -181,7 +178,7 @@ const handleRegister = async () => {
 
   try {
     await registerFormRef.value.validate();
-    const response = await register({
+    const response = await userApi.register({
       username: registerForm.username,
       password: registerForm.password,
     });

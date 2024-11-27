@@ -5,8 +5,11 @@
         <!-- 登录面板 -->
         <el-tab-pane label="登录" name="login">
           <el-form :model="loginForm" :rules="loginRules" ref="loginFormRef">
-            <el-form-item prop="username">
-              <el-input v-model="loginForm.username" placeholder="请输入用户名">
+            <el-form-item prop="ausername">
+              <el-input
+                v-model="loginForm.ausername"
+                placeholder="请输入用户名"
+              >
                 <template #prefix>
                   <el-icon>
                     <User />
@@ -15,9 +18,9 @@
               </el-input>
             </el-form-item>
 
-            <el-form-item prop="password">
+            <el-form-item prop="apassword">
               <el-input
-                v-model="loginForm.password"
+                v-model="loginForm.apassword"
                 type="password"
                 placeholder="请输入密码"
               >
@@ -45,7 +48,7 @@
 import { ref, reactive } from "vue";
 import { ElMessage } from "element-plus";
 import { User, Lock } from "@element-plus/icons-vue";
-import { login } from "@/api/AdminUser"; // 导入API方法
+import { AdminuserApi } from "@/api/AdminUser";
 import { useRouter } from "vue-router"; // 添加路由
 
 const router = useRouter(); // 用于登录成功后跳转
@@ -54,14 +57,14 @@ const activeTab = ref("login");
 
 // 登录表单数据
 const loginForm = reactive({
-  username: "",
-  password: "",
+  ausername: "",
+  apassword: "",
 });
 
 // 登录表单校验规则
 const loginRules = {
-  username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
-  password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+  ausername: [{ required: true, message: "请输入用户名", trigger: "blur" }],
+  apassword: [{ required: true, message: "请输入密码", trigger: "blur" }],
 };
 
 // 登录处理
@@ -70,10 +73,8 @@ const handleLogin = async () => {
 
   try {
     await loginFormRef.value.validate();
-    const response = await login({
-      username: loginForm.username,
-      password: loginForm.password,
-    });
+    console.log(loginForm);
+    const response = await AdminuserApi.login(loginForm); // 使用 AdminuserApi.login
 
     console.log("登录响应:", response); // 调试日志
 
