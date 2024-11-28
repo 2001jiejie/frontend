@@ -81,11 +81,12 @@ export function updateCartItemApi(cartItemId, quantity) {
 
 // 删除购物车商品（支持批量删除）
 export function removeFromCartApi(cartItemIds) {
+  console.log("删除购物车商品：", cartItemIds);
   return request({
-    url: "/cart/batch",
-    method: "delete",
+    url: "/deletecart",
+    method: "post",
     data: {
-      ids: Array.isArray(cartItemIds) ? cartItemIds : [cartItemIds],
+      cartId: cartItemIds,
     },
   });
 }

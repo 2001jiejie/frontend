@@ -121,6 +121,8 @@ const batchRemoveFromCart = async () => {
   }
   try {
     const ids = selectedItems.value.map((item) => item.id);
+    console.log("selectedItems.value：", selectedItems.value);
+    console.log("删除购物车商品：", ids);
     await removeFromCartApi(ids);
     ElMessage.success("删除成功");
     fetchCartItems();
